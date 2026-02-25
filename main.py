@@ -124,6 +124,13 @@ def visualize_pair(moving, fixed, warped=None, title=""):
     plt.suptitle(title)
     plt.show()
 
+def visualize_flow(flow, title="Flow field"):
+    mag = np.sqrt(np.sum(flow**2, axis=-1))
+    plt.imshow(mag[0], cmap='hot')
+    plt.colorbar()
+    plt.title(title)
+    plt.show()
+
 def train_dummy(epochs=5):
     """Verify shapes and loss components before loading real data."""
     zero_phi = make_zero_phi(IMG_SHAPE, INT_RES)
