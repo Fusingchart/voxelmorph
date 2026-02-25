@@ -71,6 +71,30 @@ def make_zero_phi(img_shape, int_resolution):
     flow_shape = tuple(s // int_resolution for s in img_shape) + (len(img_shape),)
     return np.zeros((1,) + flow_shape, dtype='float32')
 
+def data_generator(file_list, video_dir, ed_es_labels, batch_size=1):
+     while True:
+         np.random.shuffle(file_list)
+         batch_m, batch_f, batch_phi = [], [], []
+         for fname in file_list:
+             path = os.path.join(video_dir, fname)
+             if not os.path.exists(path): continue
+
+             ed, es = ed_es_labels[fname]
+             frames = load_echo_frames(path)
+
+             if ed >= len(frames) or es >= len(frames): continue
+
+             moving, fixed = get_ed_es_pair(frames, ed, es)
+             batch_m.append(moving)
+             batch_f.append(fixed)
+             batch_phi.append(make_zero_phi(IMG_SHAPE, INT_RES))
+
+             if len(batch_m) == batch_size:
+                 yield [np.concatenate(batch_m), np.concatenate(batch_f)], \
+                 [np.concatenate(batch_f), np.concatenate(batch_phi)]
+
+                 batch_m, batch_f, batch_phi = [], [], []
+
 # ── Training loop with real data ──────────────────────────────────────────────
 def train(video_dir: str, file_list: list, ed_es_labels: dict, epochs: int = 50):
     """
