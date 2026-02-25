@@ -2,6 +2,7 @@ import os
 import inspect
 import numpy as np
 import cv2
+import matplotlib.pyplot as plt
 
 # Compatibility patch for older voxelmorph with Python 3.11+
 if not hasattr(inspect, 'getargspec'):
@@ -106,6 +107,22 @@ def train(video_dir: str, file_list: list, ed_es_labels: dict, epochs: int = 50)
             f"Epoch {epoch+1}/{epochs} — "
             f"Total: {mean_loss[0]:.4f}  NCC: {mean_loss[1]:.4f}  Grad: {mean_loss[2]:.4f}"
         )
+
+# ── Visualization ──────────────────────────────────────────────
+def visualize_pair(moving, fixed, warped=None, title=""):
+    """Quick plot of moving / fixed / warped"""
+    fig, axs = plt.subplots(1, 3 if warped is not None else 2, figsize=(12, 5))
+    axs[0].imshow(moving[0, ..., 0], cmap='gray', vmin=0, vmax=1)
+    axs[0].set_title('Moving (ED)')
+    axs[1].imshow(fixed[0, ..., 0], cmap='gray', vmin=0, vmax=1)
+    axs[1].set_title('Fixed (ES)')
+
+    if warped is not None:
+        axs[2].imshow(warped[0, ..., 0], cmap='gray', vmin=0, vmax=1)
+        axs[2].set_title('Warped (ED - ES)')
+
+    plt.suptitle(title)
+    plt.show()
 
 def train_dummy(epochs=5):
     """Verify shapes and loss components before loading real data."""
