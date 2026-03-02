@@ -44,7 +44,7 @@ print(f"Model: 2D VxmDense {IMG_SHAPE} | TF {tf.__version__}")
 model.summary()
 
 # ── Data loading (EchoNet-Peds AVI clips) ────────────────────────────────────
-def load_echo_frames(avi_path: str, target_size=IMG_SHAPE):
+def load_echo_frames(avi_path: str, target_size=IMG_SHAPE) -> np.ndarray:
     """Load an EchoNet-Peds AVI and return all frames as float32 in [0,1]."""
     cap = cv2.VideoCapture(avi_path)
     frames = []
@@ -53,10 +53,10 @@ def load_echo_frames(avi_path: str, target_size=IMG_SHAPE):
         if not ret:
             break
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        resized = cv2.resize(gray, (target_size[1], target_size[0]))
+        resized = cv2.resize(gray, target_size[::-1])
         frames.append(resized.astype('float32') / 255.0)
     cap.release()
-    return np.stack(frames, axis=0)  # (T, H, W)
+    return np.stack(frames)
 
 def get_ed_es_pair(frames: np.ndarray, ed_idx: int, es_idx: int):
     """
