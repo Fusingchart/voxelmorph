@@ -33,7 +33,8 @@ model = vxm.networks.VxmDense(
     int_resolution=INT_RES,
 )
 
-optimizer = tf.keras.optimizers.legacy.Adam(learning_rate=LR)
+lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(initial_learning_rate = LR, decay_steps = 1000, decay_rate = 0.9)
+optimizer = tf.keras.optimizers.legacy.Adam(learning_rate = lr_schedule)
 model.compile(
     optimizer=optimizer,
     loss=[vxm.losses.NCC().loss, vxm.losses.Grad('l2').loss],
