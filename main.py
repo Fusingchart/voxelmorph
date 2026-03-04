@@ -35,11 +35,11 @@ model = vxm.networks.VxmDense(
 
 lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(initial_learning_rate = LR, decay_steps = 1000, decay_rate = 0.9)
 optimizer = tf.keras.optimizers.legacy.Adam(learning_rate = lr_schedule)
-model.compile(
-    optimizer=optimizer,
-    loss=[vxm.losses.NCC().loss, vxm.losses.Grad('l2').loss],
-    loss_weights=[NCC_WEIGHT, GRAD_WEIGHT],
-)
+
+losses = [vxm.losses.NCC(), vxm.losses.Grad("l2").loss]
+loss_weights = [NCC_WEIGHT, GRAD_WEIGHT]
+model.compile(optimizer = optimizer, loss = losses, loss_weights = loss_weights)
+
 print(f"Model: 2D VxmDense {IMG_SHAPE} | TF {tf.__version__}")
 model.summary()
 
