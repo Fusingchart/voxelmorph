@@ -44,6 +44,19 @@ print(f"Model: 2D VxmDense {IMG_SHAPE} | TF {tf.__version__}")
 model.summary()
 
 # ── Data loading (EchoNet-Peds AVI clips) ────────────────────────────────────
+def get_specific_frames(avi_path, indices, target_size):
+    cap = cv2.VideoCapture(avi_path)
+    frames = {}
+    for idx in sorted(indices):
+        cap.set(cv2.CAP_PROP_POS_FRAMES, idx)
+        ret, frame = cap.read()
+        if ret:
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            resized = cv2.resize(gray, target_size[::-1])
+            frames[idx] = resized.astype('float32') / 255.0
+    cap.release()
+    return frames
+
 def load_echo_frames(avi_path: str, target_size=IMG_SHAPE) -> np.ndarray:
     """Load an EchoNet-Peds AVI and return all frames as float32 in [0,1]."""
     cap = cv2.VideoCapture(avi_path)
